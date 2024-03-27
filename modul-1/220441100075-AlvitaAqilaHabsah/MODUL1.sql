@@ -28,7 +28,7 @@ CREATE TABLE Pengambilan_Mata_Kuliah (ID INT AUTO_INCREMENT PRIMARY KEY,
     Nama_Mata_Kuliah VARCHAR(100),
     SKS INT, Semester INT);
     
- CREATE TABLE Pembayaran_UKT (
+CREATE TABLE Pembayaran_UKT (
     id_ukt INT PRIMARY KEY AUTO_INCREMENT,
     nim VARCHAR (20),
     jumlah_pembayaran DECIMAL(10, 2),
@@ -39,8 +39,8 @@ CREATE TABLE Pembayaran_Gaji_Dosen (
     nip VARCHAR (50),
     jumlah_pembayaran DECIMAL(10, 2),
     tanggal_pembayaran DATE);
- 
- CREATE TABLE pembelian_tagihan (
+
+CREATE TABLE pembelian_tagihan (
     id INT AUTO_INCREMENT PRIMARY KEY,
     keterangan VARCHAR(255),
     jumlah DECIMAL(10, 2),
