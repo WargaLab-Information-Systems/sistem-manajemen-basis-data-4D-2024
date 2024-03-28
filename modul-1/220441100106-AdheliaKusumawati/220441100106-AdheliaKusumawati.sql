@@ -1,4 +1,4 @@
- create database db_trunojoyo;
+create database db_trunojoyo;
 use db_trunojoyo;
 
 create table mahasiswa (nim char (20) not null, 
