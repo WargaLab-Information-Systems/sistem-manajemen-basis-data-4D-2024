@@ -80,6 +80,10 @@ INSERT INTO detail_pesanan (id_detail, id_pesanan, id_produk, jumlah) VALUES
 (37, 17, 27, 2),
 (38, 18, 28, 3);
 
+SELECT * FROM pelanggan;
+SELECT * FROM pesanan;
+SELECT * FROM produk;
+SELECT * FROM detail_pesan an;
 
 -- nomer satu 
 SELECT AVG(total) FROM pesanan;
