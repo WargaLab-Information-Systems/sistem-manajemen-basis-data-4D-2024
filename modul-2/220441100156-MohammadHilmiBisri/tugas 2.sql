@@ -102,6 +102,7 @@ SELECT p.nama_pelanggan, COUNT(ps.id_pesanan) AS jumlah_pesanan
 FROM pelanggan p
 JOIN pesanan ps ON p.id_pelanggan = ps.id_pelanggan
 WHERE ps.tanggal_pesanan >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+    AND ps.tanggal_pesanan < CURDATE()
 GROUP BY p.nama_pelanggan;
 
 SELECT * FROM total_pesanan_per_pelanggan;
