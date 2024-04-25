@@ -1,112 +1,122 @@
-CREATE DATABASE db_kampus;
+CREATE DATABASE toko_barokah;
+USE toko_barokah;
 
-
-USE db_kampus;
-
-CREATE TABLE tb_mahasiswa(
-	nim INT(12) NOT NULL PRIMARY KEY,
-    nama_mhs VARCHAR(50) NOT NULL,
-    pengambilan_matkul VARCHAR(50) NOT NULL,
-     status ENUM('aktif', 'berhenti', 'lulus') NOT NULL
+CREATE TABLE tb_pelanggan(
+	id_pelanggan INT NOT NULL PRIMARY KEY,
+    nama_pelanggan VARCHAR (50),
+    email VARCHAR (50),
+	alamat VARCHAR (50)
 );
-DESC tb_mahasiswa;
+DESC tb_pelanggan;
 
-CREATE TABLE tb_dosen(
-	nip INT(12) NOT NULL PRIMARY KEY,
-    nama_dosen VARCHAR(50) NOT NULL,
-    jenis_kelamin ENUM('laki - laki', 'perempuan'),
-    fakultas VARCHAR(50) NOT NULL
+CREATE TABLE tb_pesanan(
+	id_pesanan INT NOT NULL PRIMARY KEY,
+    id_pelanggan INT,
+    tanggal_pesanan DATE,
+    total INT,
+    FOREIGN KEY (id_pelanggan) REFERENCES tb_pelanggan(id_pelanggan)
 );
-DESC tb_dosen;
+DESC tb_pesanan;
 
-CREATE TABLE tb_TransaksiKeuangan (
-    id_transaksi INT PRIMARY KEY AUTO_INCREMENT,
-    tanggal_transaksi DATE NOT NULL,
-    jenis_transaksi ENUM('Pembayaran_UKT', 'Pembayaran_Gaji_Dosen', 'Pembelian_Peralatan_Bahan_Ajar', 'Pembayaran_Tagihan') NOT NULL,
-    keterangan VARCHAR(50) NOT NULL,
-    jumlah INT  NOT NULL
+CREATE TABLE tb_produk(
+	id_produk INT NOT NULL PRIMARY KEY,
+    nama_produk VARCHAR(50),
+    harga INT,
+    stok int
 );
-DESC tb_TransaksiKeuangan;
+DESC tb_produk;
 
-CREATE TABLE tb_laporan(
-	id_laporan INT PRIMARY KEY AUTO_INCREMENT,
-    tanggal_laporan DATE NOT NULL,
-    jumlah_mhs INT NOT NULL,
-    jumlah_dosen INT NOT NULL
+CREATE TABLE detail_pesanan(
+	id_detail INT NOT NULL PRIMARY KEY,
+    id_pesanan INT,
+    id_produk INT,
+    jumlah INT,
+    FOREIGN KEY (id_pesanan) REFERENCES tb_pesanan (id_pesanan),
+    FOREIGN KEY (id_produk) REFERENCES tb_produk (id_produk)
 );
-DESC tb_laporan;
+DESC detail_pesanan;
 
+INSERT INTO tb_pelanggan (id_pelanggan, nama_pelanggan, email, alamat) VALUES
+	(01, 'Andini', 'andini@gmail.com', 'Mojokerto'),
+    (02, 'Steven', 'steven@gmail.com', 'Surabaya'),
+    (03, 'Andika', 'andika@gmail.com', 'Jombang'),
+    (04, 'Adinda', 'adinda@gmail.com', 'Sidoarjo'),
+    (05, 'Alifia', 'alifia@gmail.com', 'Sampang');
+SELECT * FROM tb_pelanggan;
+    
+INSERT INTO tb_pesanan (id_pesanan, id_pelanggan, tanggal_pesanan, total) VALUES
+	(100, 01, '2024-04-04', 30000),
+    (101, 02, '2024-03-03', 25000),
+    (102, 03, '2024-01-02', 20000),
+    (103, 04, '2024-02-21', 75000),
+    (104, 05, '2024-03-30', 52500);
+SELECT * FROM tb_pesanan;
 
-CREATE TABLE tb_laporanKeuangan(
-	id_laporanKeuangan INT PRIMARY KEY AUTO_INCREMENT,
-    tanggal_laporan DATE NOT NULL,
-    jenis_transaksi ENUM('Pembayaran_UKT', 'Pembayaran_Gaji_Dosen', 'Pembelian_Peralatan_Bahan_Ajar', 'Pembayaran_Tagihan') NOT NULL,
-    pemasukan INT NOT NULL,
-    pengeluaran INT NOT NULL
+INSERT INTO tb_produk (id_produk, nama_produk, harga, stok) VALUES
+	(200, 'kopi', 6000, 6),
+    (201, 'Sunlight', 5000, 10),
+    (202, 'Rinso', 10000, 5),
+    (203, 'Garam', 7500, 3),
+    (204, 'Minyak', 17500, 7);
+SELECT * FROM tb_produk;
+
+INSERT INTO detail_pesanan (id_detail, id_pesanan, id_produk, jumlah) VALUES
+	(120, 100, 200, 5),
+    (121, 101, 201, 5),
+    (122, 102, 202, 2),
+    (123, 103, 203, 10),
+    (124, 104, 204, 3);
+SELECT * FROM detail_pesanan;
+    
+CREATE VIEW view_pesanan_lebih_dari_rata_rata AS 
+SELECT p.nama_pelanggan, ps.total, ps.tanggal_pesanan
+FROM tb_pelanggan p
+JOIN tb_pesanan ps ON p.id_pelanggan = ps.id_pelanggan
+WHERE ps.total >(
+SELECT AVG(total) FROM tb_pesanan
 );
-DESC tb_laporanKeuangan;
+SELECT * FROM view_pesanan_lebih_dari_rata_rata;
 
-INSERT INTO tb_mahasiswa (nim, nama_mhs, pengambilan_matkul, status) VALUES
-	(100137, 'Andini Dwi Cahyani', 'Pemrograman Dasar', 'aktif'),
-	(100142, 'Nur Alifia Faryanti', 'Basis Data', 'aktif'),
-	(100321, 'Shafira Zujhrufatus Zahra', 'Pemrograman Lanjut', 'berhenti'),
-	(100456, 'Farra Athikasari', 'Algoritma dan Struktur Data', 'aktif'),
-	(100789, 'Vivin Fiana', 'Sistem Operasi', 'aktif'),
-	(100890, 'Nabila Putri Alaika', 'Jaringan Komputer', 'lulus'),
-	(109012, 'Husnul Khotimah', 'Kecerdasan Buatan', 'aktif'),
-	(100123, 'Hofifah', 'Manajemen Proyek', 'berhenti'),
-	(100234, 'Noer Padhilah', 'Analisis Data', 'aktif'),
-	(100345, 'Putri Syafina', 'Pengembangan Web', 'aktif');
-SELECT * FROM tb_mahasiswa;
+CREATE VIEW view_detail_penjualan AS
+SELECT 
+	pr.nama_produk, 
+    pr.harga AS harga_satuan,
+    dp.jumlah AS jumlah_produk_terjual,
+	(pr.harga * dp.jumlah) AS total_pendapatan 
+FROM tb_produk pr
+JOIN detail_pesanan dp ON pr.id_produk = dp.id_produk;
+SELECT * FROM view_detail_penjualan;
 
-INSERT INTO tb_dosen (nip, nama_dosen, jenis_kelamin, fakultas) VALUES
-	(567890, 'Wahyudi Setiawan', 'laki - laki', 'Fakultas Teknik'),
-	(678901, 'Ersa Alami', 'perempuan', 'Fakultas Ilmu Pendidikan'),
-	(789012, 'Sarkawi', 'laki - laki', 'Fakultas Keislaman'),
-	(890123, 'Eza Rachmanita', 'perempuan', 'Fakultas Ekonomi dan Bisnis'),
-	(901234, 'Yudha Dwi Putra Negara', 'laki - laki', 'Fakultas Hukum'),
-	(012345, 'Sri Herawati', 'perempuan', 'Fakultas Kedokteran'),
-	(123456, 'Achmad Zain Nur', 'laki - laki', ' Fakultas Teknik'),
-	(234567, 'Budi Dwi Satoto', 'laki - laki', 'Fakultas Ilmu Sosial dan Budaya'),
-	(345678, 'Bain Khusnul', 'perempuan', 'Fakultas Keislaman'),
-	(456789, 'Ali Syakur', 'laki - laki', 'Fakultas Ekonomi dan Bisnis');
-SELECT * FROM tb_dosen;
+CREATE VIEW view_produk_stok_kurang_dari_5 AS
+SELECT 
+	nama_produk,
+    stok
+FROM tb_produk
+WHERE stok < 5;
+SELECT * FROM view_produk_stok_kurang_dari_5;
 
-INSERT INTO tb_TransaksiKeuangan (tanggal_transaksi, jenis_transaksi, keterangan, jumlah) VALUES
-	('2020-08-01', 'Pembayaran_UKT', 'Pembayaran UKT oleh mahasiswa atas Nama Andini', 5000000),
-	('2021-02-02', 'Pembayaran_Gaji_Dosen', 'Pembayaran gaji bulan Februari', 10000000),
-	('2022-03-03', 'Pembelian_Peralatan_Bahan_Ajar', 'Pembelian buku teks', 2000000),
-	('2022-03-04', 'Pembayaran_Tagihan', 'Pembayaran listrik bulan Maret', 7500000),
-	('2023-03-15', 'Pembayaran_UKT', 'Pembayaran UKT oleh mahasiswa atas nama Cahyani', 4500000),
-	('2023-03-20', 'Pembayaran_Gaji_Dosen', 'Pembayaran gaji bulan Maret', 12000000),
-	('2024-01-07', 'Pembelian_Peralatan_Bahan_Ajar', 'Pembelian perangkat presentasi', 3000000),
-	('2024-03-08', 'Pembayaran_Tagihan', 'Pembayaran air bulan Maret', 8000000),
-	('2024-04-09', 'Pembayaran_UKT', 'Pembayaran UKT oleh mahasiswa atas nama Dwi', 4800000),
-	('2024-04-10', 'Pembayaran_Gaji_Dosen', 'Pembayaran gaji bulan April', 11000000);
-SELECT * FROM tb_TransaksiKeuangan;
+CREATE VIEW total_pesanan_per_pelanggan AS
+SELECT p.nama_pelanggan, COUNT(ps.id_pesanan) AS jumlah_total_pesanan, ps.tanggal_pesanan
+FROM tb_pelanggan p
+JOIN tb_pesanan ps ON p.id_pelanggan = ps.id_pelanggan
+WHERE ps.tanggal_pesanan >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) 
+GROUP BY p.nama_pelanggan, ps.tanggal_pesanan;
+SELECT * FROM total_pesanan_per_pelanggan;
 
-INSERT INTO tb_laporan (tanggal_laporan, jumlah_mhs, jumlah_dosen) VALUES
-	('2015-08-09', 1500, 100),
-	('2016-03-02', 1550, 105),
-	('2017-07-27', 1600, 110),
-	('2018-05-20', 1650, 115),
-	('2019-06-10', 1700, 120),
-	('2020-04-06', 1750, 125),
-	('2021-09-07', 1800, 130),
-	('2022-02-22', 1850, 135),
-	('2023-01-01', 1900, 140),
-	('2024-07-10', 1950, 145);
-SELECT * FROM tb_laporan;
 
-INSERT INTO tb_laporanKeuangan (tanggal_laporan, jenis_transaksi, pemasukan, pengeluaran) VALUES
-	('2015-09-09', 'Pembayaran_UKT', 15000000, 8000000),
-	('2016-02-02', 'Pembelian_Peralatan_Bahan_Ajar', 16000000, 8500000),
-	('2017-10-27', 'Pembayaran_Gaji_Dosen', 17000000, 9000000),
-	('2018-06-20', 'Pembayaran_Tagihan', 18000000, 9250000),
-	('2019-09-10', 'Pembelian_Peralatan_Bahan_Ajar', 19000000, 9500000),
-	('2020-04-06', 'Pembayaran_UKT', 20000000, 1000000),
-	('2021-10-07', 'Pembayaran_Gaji_Dosen', 21000000, 1050000),
-	('2022-12-22', 'Pembayaran_Tagihan', 22000000, 1750000),
-	('2023-11-23', 'Pembelian_Peralatan_Bahan_Ajar', 23000000, 1850000),
-	('2024-12-31', 'Pembayaran_Gaji_Dosen', 24000000, 1250000);
-SELECT * FROM tb_laporanKeuangan;
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+
+
+    
+
+
+    
