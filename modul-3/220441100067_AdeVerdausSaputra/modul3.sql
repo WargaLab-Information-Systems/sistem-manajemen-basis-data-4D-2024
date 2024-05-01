@@ -14,6 +14,7 @@ CREATE TABLE anggota (
   status_pinjam varchar(15) NOT NULL
 );
 
+
 -- Tabel buku
 CREATE TABLE buku (
   kode_buku varchar(10) PRIMARY KEY,
