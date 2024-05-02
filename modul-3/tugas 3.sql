@@ -93,14 +93,16 @@ BEGIN
     SELECT * FROM anggota WHERE Angkatan_Anggota = angkatan AND Tempat_Lahir_Anggota = tempatLahir AND Jenis_Kelamin = jenisKelamin;
 END;
 DELIMITER;
-DELIMITER//
+
+DELIMITER //
 -- 5. Definisikan stored procedure untuk memasukkan data pada table anggota.
-CREATE PROCEDURE InsertAnggota(IN idAnggota VARCHAR(10), IN namaAnggota VARCHAR(20), IN angkatanAnggota VARCHAR(6), IN tempatLahirAnggota VARCHAR(6), IN tanggalLahirAnggota DATE, IN noTelp INT(12), IN jenisKelamin VARCHAR(15), IN statusPinjam VARCHAR(15))
+CREATE PROCEDURE InsertAnggota(IN idAnggota VARCHAR(10), IN namaAnggota VARCHAR(20), IN angkatanAnggota VARCHAR(6), IN tempatLahirAnggota VARCHAR(6), IN tanggalLahirAnggota DATE, IN noTelp VARCHAR(12), IN jenisKelamin VARCHAR(15), IN statusPinjam VARCHAR(15))
 BEGIN
     INSERT INTO anggota (IdAnggota, Nama_Anggota, Angkatan_Anggota, Tempat_Lahir_Anggota, Tanggal_Lahir_Anggota, No_Telp, Jenis_Kelamin, Status_Pinjam)
     VALUES (idAnggota, namaAnggota, angkatanAnggota, tempatLahirAnggota, tanggalLahirAnggota, noTelp, jenisKelamin, statusPinjam);
 END;
 DELIMITER;
+
 DELIMITER //
 -- 6. Definisikan stored procedure untuk mengetahui data jumlah anggota menggunakan parameter OUT.
 CREATE PROCEDURE GetJumlahAnggota(OUT jumlahAnggota INT)
@@ -115,3 +117,30 @@ BEGIN
     SELECT COUNT(*) INTO jumlahBuku FROM buku WHERE Pengarang_Buku = pengarang AND Tahun_Buku = tahun;
 END;
 DELIMITER;
+
+-- Pemanggilan stored procedure GetAnggotaByStatus
+CALL GetAnggotaByStatus('Aktif');
+
+-- Pemanggilan stored procedure GetBukuByPenerbit
+CALL GetBukuByPenerbit('Bentang Pustaka');
+
+-- Pemanggilan stored procedure GetPeminjamanByTanggalAndKode
+CALL GetPeminjamanByTanggalAndKode('2022-01-01', 'B001');
+
+-- Pemanggilan stored procedure GetAnggotaByAngkatanAndTempatLahirAndJenisKelamin
+CALL GetAnggotaByAngkatanAndTempatLahirAndJenisKelamin('2019', 'Jakarta', 'Laki-laki');
+
+-- Pemanggilan stored procedure InsertAnggota
+CALL InsertAnggota('A011', 'Michael', '2020', 'Surabaya', '1993-09-09', '081234567891', 'Laki-laki', 'Aktif');
+
+-- Pemanggilan stored procedure GetJumlahAnggota
+CALL GetJumlahAnggota(@jumlahAnggota);
+SELECT @jumlahAnggota;
+
+-- Pemanggilan stored procedure GetJumlahBukuByPengarangAndTahun
+SET @pengarang = 'Andrea Hirata';
+SET @tahun = '2005';
+CALL GetJumlahBukuByPengarangAndTahun(@pengarang, @tahun, @jumlahBuku);
+SELECT @jumlahBuku;
+
+
