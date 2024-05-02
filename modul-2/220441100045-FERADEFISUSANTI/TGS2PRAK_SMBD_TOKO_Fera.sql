@@ -4,9 +4,9 @@ USE tokobarokah;
 --  Membuat tabel pelanggan
 CREATE TABLE pelanggan (
     id_pelanggan INT PRIMARY KEY,
-    nama_pelanggan VARCHAR(100),
-    email VARCHAR(50),
-    alamat VARCHAR(255)
+    nama_pelanggan VARCHAR(100) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    alamat VARCHAR(255) NOT NULL
 );
 INSERT INTO pelanggan (id_pelanggan, nama_pelanggan, email, alamat)
 VALUES 
@@ -25,9 +25,9 @@ VALUES
 -- Membuat tabel pesanan
 CREATE TABLE pesanan (
     id_pesanan INT PRIMARY KEY,
-    id_pelanggan INT,
-	tanggal_pesanan DATE,
-    total INT,
+    id_pelanggan INT NOT NULL,
+	tanggal_pesanan DATE NOT NULL,
+    total INT NOT NULL,
     FOREIGN KEY (id_pelanggan) REFERENCES pelanggan(id_pelanggan)
 );
 INSERT INTO pesanan (id_pesanan, id_pelanggan, tanggal_pesanan, total)
@@ -41,14 +41,17 @@ VALUES
     (7, 7, '2024-03-07', 18000),
     (8, 8, '2024-03-08', 12000),
     (9, 9, '2024-03-09', 18000),
-    (10, 10, '2024-03-10', 22000);
+    (10, 10, '2024-03-10', 22000),
+    (11, 9, '2024-05-01', 32000),
+    (12, 8, '2024-05-02', 28000);
+
 
 -- Membuat tabel produk
 CREATE TABLE produk (
     id_produk INT PRIMARY KEY,
-    nama_produk VARCHAR(100),
-    harga INT,
-    stok INT
+    nama_produk VARCHAR(100) NOT NULL,
+    harga INT NOT NULL,
+    stok INT NOT NULL
 );
 INSERT INTO produk (id_produk, nama_produk, harga, stok)
 VALUES 
@@ -66,9 +69,9 @@ VALUES
 -- Membuat tabel detail pesanan
 CREATE TABLE detail_pesanan (
     id_detail INT PRIMARY KEY,
-    id_pesanan INT,
-    id_produk INT,
-	jumlah INT,
+    id_pesanan INT NOT NULL,
+    id_produk INT NOT NULL,
+	jumlah INT NOT NULL,
     FOREIGN KEY (id_pesanan) REFERENCES pesanan(id_pesanan),
     FOREIGN KEY (id_produk) REFERENCES produk(id_produk)
 );
@@ -106,13 +109,18 @@ WHERE stok < 5;
 
 -- 4. View yang menampilkan nama pelanggan dan jumlah total pesanan
 CREATE VIEW total_pesanan_per_pelanggan AS
-SELECT p.nama_pelanggan, SUM(ps.total) AS total_pesanan
+SELECT p.nama_pelanggan, SUM(ps.total) AS total_pesanan, ps.tanggal_pesanan
 FROM pelanggan p
 JOIN pesanan ps ON p.id_pelanggan = ps.id_pelanggan
 WHERE ps.tanggal_pesanan >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)
-GROUP BY p.nama_pelanggan;
+GROUP BY p.nama_pelanggan, ps.tanggal_pesanan;
 
-SELECT*FROM pesanan_lebih_dari_rata_rata;
+SELECT * FROM pesanan_lebih_dari_rata_rata
+INNER JOIN (
+    SELECT AVG(total) AS rata_rata_total
+    FROM pesanan
+) AS subquery ON pesanan_lebih_dari_rata_rata.total > subquery.rata_rata_total;
+
 SELECT*FROM detail_penjualan;
 SELECT*FROM stok_kurang_dari_5;
 SELECT*FROM total_pesanan_per_pelanggan;
