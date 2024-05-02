@@ -79,6 +79,7 @@ FROM tb_pesanan pes
 JOIN tb_pelanggan p ON pes.id_pelanggan = p.id_pelanggan
 WHERE pes.total > (SELECT AVG(total) FROM tb_pesanan);
 
+SELECT AVG (total) from tb_pesanan;
 SELECT * FROM view_total_atas_rata_rata;
 
 CREATE VIEW view_produk_terjual AS
@@ -95,10 +96,17 @@ WHERE stock < 5;
 SELECT * FROM view_produk_stok_kurang_5;
 
 CREATE VIEW view_total_pesanan_perpelanggan AS
-SELECT p.nama_pelanggan, SUM(pes.total) AS total_pesanan
+SELECT p.nama_pelanggan, COUNT(pes.total) AS total_pesanan
 FROM tb_pesanan pes
 JOIN tb_pelanggan p ON pes.id_pelanggan = p.id_pelanggan
-WHERE pes.tanggal_pesanan >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+WHERE pes.tanggal_pesanan BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) AND CURRENT_DATE()
 GROUP BY p.nama_pelanggan;
 
 SELECT * FROM view_total_pesanan_perpelanggan;
+INSERT INTO tb_pesanan (id_pesanan, id_pelanggan, tanggal_pesanan, total) 
+VALUES 
+(6, 004, '2024-04-04', 900000),
+(7, 001, '2024-04-01', 500000);
+
+
+select*from tb_produk;
