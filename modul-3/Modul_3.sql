@@ -2,52 +2,57 @@ CREATE DATABASE perpustakaan;
 USE perpustakaan;
 
 CREATE TABLE petugas ( 
-idPetugas VARCHAR (10) PRIMARY KEY, 
-Username VARCHAR (15), 
-PASSWORD VARCHAR(15), 
-Nama VARCHAR (25));
-
+	idPetugas VARCHAR (10) PRIMARY KEY, 
+	Username VARCHAR (15), 
+	PASSWORD VARCHAR(15), 
+	Nama VARCHAR (25)
+    );
+    
 CREATE TABLE buku ( kode_buku VARCHAR (10) PRIMARY KEY, 
-judul_buku VARCHAR (25), 
-pengarang_buku VARCHAR(30), 
-penerbit_buku VARCHAR (30),
-tahun_buku VARCHAR (10), 
-jumlah_buku VARCHAR (5), 
-status_buku VARCHAR (10), 
-klasifikasi_buku VARCHAR (20));
+	judul_buku VARCHAR (25), 
+	pengarang_buku VARCHAR(30), 
+	penerbit_buku VARCHAR (30),
+	tahun_buku VARCHAR (10), 
+	jumlah_buku VARCHAR (5), 
+	status_buku VARCHAR (10), 
+	klasifikasi_buku VARCHAR (20)
+    );
 
 CREATE TABLE anggota ( 
-idAnggota VARCHAR (10) PRIMARY KEY, 
-nama_anggota VARCHAR (20), 
-angkatan_anggota VARCHAR(6), 
-tempat_lahir_anggota VARCHAR (20),
-tanggal_lahir_anggota DATE, 
-no_telp VARCHAR (12), 
-jenis_kelamin VARCHAR (15), 
-status_pinjam VARCHAR (15));
+	idAnggota VARCHAR (10) PRIMARY KEY, 
+	nama_anggota VARCHAR (20), 
+	angkatan_anggota VARCHAR(6), 
+	tempat_lahir_anggota VARCHAR (20),
+	tanggal_lahir_anggota DATE, 
+	no_telp VARCHAR (12), 
+	jenis_kelamin VARCHAR (15), 
+	status_pinjam VARCHAR (15)
+    );
 
 CREATE TABLE peminjaman( 
-kode_peminjaman VARCHAR (10) PRIMARY KEY, 
-idAnggota VARCHAR (10),
-idPetugas VARCHAR (10), 
-tanggal_pinjam DATE, 
-tanggal_kembali DATE, 
-kode_buku VARCHAR (10), 
-FOREIGN KEY (idAnggota) REFERENCES anggota(idAnggota),
-FOREIGN KEY (idPetugas) REFERENCES petugas(idPetugas), 
-FOREIGN KEY (kode_buku) REFERENCES buku(kode_buku));
+	kode_peminjaman VARCHAR (10) PRIMARY KEY, 
+	idAnggota VARCHAR (10),
+	idPetugas VARCHAR (10), 
+	tanggal_pinjam DATE, 
+	tanggal_kembali DATE, 
+	kode_buku VARCHAR (10), 
+	FOREIGN KEY (idAnggota) REFERENCES anggota(idAnggota),
+	FOREIGN KEY (idPetugas) REFERENCES petugas(idPetugas), 
+	FOREIGN KEY (kode_buku) REFERENCES buku(kode_buku)
+    );
 
 CREATE TABLE pengembalian( 
-kode_kembali VARCHAR (10) PRIMARY KEY, 
-idAnggota VARCHAR (10), 
-kode_buku VARCHAR (10), 
-idPetugas VARCHAR (10), 
-tgl_pinjam DATE, 
-tgl_kembali DATE, 
-denda VARCHAR (15), 
-FOREIGN KEY (idAnggota) REFERENCES anggota(idAnggota),
-FOREIGN KEY (idPetugas) REFERENCES petugas(idPetugas), 
-FOREIGN KEY (kode_buku) REFERENCES buku(kode_buku));
+	kode_kembali VARCHAR (10) PRIMARY KEY, 
+	idAnggota VARCHAR (10), 
+	kode_buku VARCHAR (10), 
+	idPetugas VARCHAR (10), 
+	tgl_pinjam DATE, 
+	tgl_kembali DATE, 
+	denda VARCHAR (15), 
+	FOREIGN KEY (idAnggota) REFERENCES anggota(idAnggota),
+	FOREIGN KEY (idPetugas) REFERENCES petugas(idPetugas), 
+	FOREIGN KEY (kode_buku) REFERENCES buku(kode_buku)
+    );
 
 -- Isi data untuk tabel petugas
 INSERT INTO petugas (idPetugas, Username, PASSWORD, Nama) VALUES
@@ -116,7 +121,7 @@ INSERT INTO pengembalian (kode_kembali, idAnggota, kode_buku, idPetugas, tgl_pin
 
 -- 1. parameter IN default 
 DELIMITER //
-CREATE PROCEDURE search_anggota(IN anggota_id VARCHAR(10))
+CREATE PROCEDURE search_anggota(anggota_id VARCHAR(10))
 BEGIN
     SELECT * FROM anggota WHERE idAnggota = anggota_id;
 END //
@@ -127,10 +132,12 @@ CALL search_anggota('AGT002');
 DELIMITER //
 CREATE PROCEDURE GetDatabuku(IN buku_kode VARCHAR(10))
 BEGIN
-    SELECT * FROM buku WHERE kode_buku = buku_kode;
+    SELECT * FROM buku WHERE Kode_Buku LIKE concat('%', buku_kode, '%');
 END//
 DELIMITER ;
-CALL GetDatabuku ('BK005');
+
+CALL GetDatabuku ('BK');
+drop procedure GetDatabuku;
 
 -- 3. data pada table anggota berdasarkan dua field yaitu angkatan dan jenis kelamin.
 DELIMITER //
@@ -189,7 +196,7 @@ SELECT @jumlah
 -- 7. mengetahui data jumlah anggota berdasarkan angkatan dan jenis kelaminnya menggunakan parameter INOUT.
 DELIMITER //
 CREATE PROCEDURE Jumlahanggota(
-    IN angkatan VARCHAR(6),
+        IN angkatan VARCHAR(6),
     IN jenis_kelamin_anggota VARCHAR(15),
     OUT jumlah_anggota INT)
 BEGIN
@@ -199,5 +206,6 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP procedure Jumlahanggota;
 CALL Jumlahanggota('2022', 'Perempuan', @jumlah_anggota);
 SELECT @jumlah_anggota AS 'Jumlah_Anggota';
