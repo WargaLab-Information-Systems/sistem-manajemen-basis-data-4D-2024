@@ -1,7 +1,7 @@
 // SUKMA AYU MAHARANI
 // 220441100077
 //SISTEM MANAJEMEN BASIS DATA - 4D
-UTS 
+UTS
 
 use wawaaaawwww;
 -- nomer 1
