@@ -258,4 +258,16 @@ SELECT * FROM peminjaman
 
 CALL test3('2024-04-02', 'BK002', @jumlahPeminjam);
 SELECT @jumlahPeminjam AS 'Jumlah Peminjam',Tanggal_Pinjam,Kode_Buku FROM peminjaman
+drop procedure test5
 
+delimiter //
+create procedure test5 (
+id_anggota varchar (25)
+)
+begin 
+	select * from anggota where id_anggota = idAnggota;
+end //
+
+delimiter;
+
+call test5('A002')

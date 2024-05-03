@@ -137,6 +137,8 @@ JOIN pesanan ps ON p.id_pelanggan = ps.id_pelanggan
 WHERE ps.tanggal_pesanan >= DATE_SUB('2022-04-01', INTERVAL 1 MONTH)
 GROUP BY p.nama_pelanggan;
 
+create view topes as 
+
 SELECT * FROM pesanan 
 SELECT *  FROM produk
 SELECT * FROM pelanggan
@@ -158,4 +160,15 @@ SELECT * FROM v_pesanan_lebih_dari_rata_rata;
 SELECT * FROM v_detail_penjualan;
 SELECT * FROM v_stok_kurang_dari_5;
 SELECT * FROM v_total_pesanan_per_pelanggan;
- 
+select * from pesanan
+
+drop view test4
+
+create view test4 as
+select nama_pelanggan,nama_produk,harga,tanggal_pesanan as tanggal_beli from pelanggan 
+NATURAL JOIN pesanan 
+join detail_pesanan on detail_pesanan.id_pesanan = pesanan.id_pesanan 
+join produk on detail_pesanan.id_produk=produk.id_produk 
+group by nama_produk
+
+select * from test4
