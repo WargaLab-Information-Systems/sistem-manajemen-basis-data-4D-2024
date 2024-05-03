@@ -46,7 +46,7 @@ OUT stok INT(3)
 )
 BEGIN 
 SELECT sum(stok) FROM barang
-where stok_barang=stok;
+where stok_barang=stok >6;
 END //
 DELIMITER //
 
