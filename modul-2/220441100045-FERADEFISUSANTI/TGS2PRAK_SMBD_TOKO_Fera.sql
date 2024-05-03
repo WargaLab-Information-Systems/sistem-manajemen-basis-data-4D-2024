@@ -45,7 +45,6 @@ VALUES
     (11, 9, '2024-05-01', 32000),
     (12, 8, '2024-05-02', 28000);
 
-
 -- Membuat tabel produk
 CREATE TABLE produk (
     id_produk INT PRIMARY KEY,
@@ -120,7 +119,6 @@ INNER JOIN (
     SELECT AVG(total) AS rata_rata_total
     FROM pesanan
 ) AS subquery ON pesanan_lebih_dari_rata_rata.total > subquery.rata_rata_total;
-
 SELECT*FROM detail_penjualan;
 SELECT*FROM stok_kurang_dari_5;
 SELECT*FROM total_pesanan_per_pelanggan;
