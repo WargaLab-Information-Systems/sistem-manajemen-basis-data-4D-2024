@@ -78,23 +78,17 @@ FROM pesanan ps
 JOIN pelanggan p ON ps.id_pelanggan = p.id_pelanggan
 WHERE ps.total > (SELECT AVG(total) FROM pesanan);
 
--- Menampilkan data dari view "pesanan_lebih_rata"
-SELECT * FROM pesanan_lebih_rata;
 
 CREATE VIEW produk_terjual AS
 SELECT pr.nama_produk, pr.harga, dp.jumlah, (pr.harga * dp.jumlah) AS total_pendapatan
 FROM produk pr
 JOIN detail_pesanan dp ON pr.id_produk = dp.id_produk;
 
--- Menampilkan data dari view "produk_terjual"
-SELECT * FROM produk_terjual;
 
 CREATE VIEW produk_stok_kurang AS
 SELECT nama_produk, stok
 FROM produk
 WHERE stok < 5;
-
-SELECT * FROM produk_stok_kurang;
 
 
 CREATE VIEW total_pesanan_per_pelanggan AS
@@ -102,7 +96,7 @@ SELECT p.nama_pelanggan, COUNT(ps.id_pesanan) AS jumlah_pesanan
 FROM pelanggan p
 JOIN pesanan ps ON p.id_pelanggan = ps.id_pelanggan
 WHERE ps.tanggal_pesanan >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
-    AND ps.tanggal_pesanan <= CURDATE()
 GROUP BY p.nama_pelanggan;
 
-SELECT * FROM total_pesanan_per_pelanggan;
+
+
