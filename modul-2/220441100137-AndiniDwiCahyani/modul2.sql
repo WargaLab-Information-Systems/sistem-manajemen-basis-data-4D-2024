@@ -1,5 +1,5 @@
-CREATE DATABASE warung_madura;
-USE warung_madura;
+CREATE DATABASE toko_barokah;
+USE toko_barokah;
 
 CREATE TABLE tb_pelanggan(
 	id_pelanggan INT NOT NULL PRIMARY KEY,
@@ -37,45 +37,41 @@ CREATE TABLE detail_pesanan(
 DESC detail_pesanan;
 
 INSERT INTO tb_pelanggan (id_pelanggan, nama_pelanggan, email, alamat) VALUES
-	(01, 'Jennie', 'jennie@gmail.com', 'Nganjuk'),
-    (02, 'Rose', 'rose@gmail.com', 'Surabaya'),
-    (03, 'Lisa', 'lisa@gmail.com', 'Jombang'),
-    (04, 'Zayyan', 'zayyan@gmail.com', 'Probolinggo'),
-    (05, 'Jaemin', 'jaemin@gmail.com', 'Sampang');
+	(01, 'Andini', 'andini@gmail.com', 'Mojokerto'),
+    (02, 'Steven', 'steven@gmail.com', 'Surabaya'),
+    (03, 'Andika', 'andika@gmail.com', 'Jombang'),
+    (04, 'Adinda', 'adinda@gmail.com', 'Sidoarjo'),
+    (05, 'Alifia', 'alifia@gmail.com', 'Sampang');
 SELECT * FROM tb_pelanggan;
     
 INSERT INTO tb_pesanan (id_pesanan, id_pelanggan, tanggal_pesanan, total) VALUES
-	(201, 01, '2024-04-04', 30000),
-    (202, 02, '2024-03-03', 35000),
-    (203, 03, '2024-01-02', 500000),
-    (204, 04, '2024-02-21', 85000),
-    (205, 05, '2024-03-30', 30000);
+	(100, 01, '2024-04-04', 30000),
+    (101, 02, '2024-03-03', 25000),
+    (102, 03, '2024-01-02', 20000),
+    (103, 04, '2024-02-21', 75000),
+    (104, 05, '2024-03-30', 52500);
 SELECT * FROM tb_pesanan;
 
 INSERT INTO tb_produk (id_produk, nama_produk, harga, stok) VALUES
-	(101, 'Mie Dara', 5000, 6),
-    (102, 'Gula', 7000, 5),
-    (103, 'Beras', 10000, 8),
-    (104, 'Garam', 5000, 6),
-    (105, 'Minyak', 10000, 4);
+	(200, 'kopi', 6000, 6),
+    (201, 'Sunlight', 5000, 10),
+    (202, 'Rinso', 10000, 5),
+    (203, 'Garam', 7500, 3),
+    (204, 'Minyak', 17500, 7);
 SELECT * FROM tb_produk;
 
-UPDATE tb_produk
-SET stok = stok - 3
-WHERE id_produk = 105;
-
-
 INSERT INTO detail_pesanan (id_detail, id_pesanan, id_produk, jumlah) VALUES
-	(11, 201, 101, 6),
-    (12, 202, 102, 5),
-    (13, 203, 103, 5),
-    (14, 204, 104, 6),
-    (15, 205, 105, 3);
+	(120, 100, 200, 5),
+    (121, 101, 201, 5),
+    (122, 102, 202, 2),
+    (123, 103, 203, 10),
+    (124, 104, 204, 3);
 SELECT * FROM detail_pesanan;
     
 CREATE VIEW view_pesanan_lebih_dari_rata_rata AS 
 SELECT p.nama_pelanggan, ps.total, ps.tanggal_pesanan
-FROM tb_pelanggan p JOIN tb_pesanan ps ON p.id_pelanggan = ps.id_pelanggan
+FROM tb_pelanggan p
+JOIN tb_pesanan ps ON p.id_pelanggan = ps.id_pelanggan
 WHERE ps.total >(
 SELECT AVG(total) FROM tb_pesanan
 );
@@ -83,27 +79,44 @@ SELECT * FROM view_pesanan_lebih_dari_rata_rata;
 
 CREATE VIEW view_detail_penjualan AS
 SELECT 
-	a.nama_produk, 
-    a.harga AS harga_satuan,
-    b.jumlah AS jumlah_produk_terjual,
-	(a.harga * b.jumlah) AS total_pendapatan 
-FROM tb_produk a
-JOIN detail_pesanan b ON a.id_produk = b.id_produk;
+	pr.nama_produk, 
+    pr.harga AS harga_satuan,
+    dp.jumlah AS jumlah_produk_terjual,
+	(pr.harga * dp.jumlah) AS total_pendapatan 
+FROM tb_produk pr
+JOIN detail_pesanan dp ON pr.id_produk = dp.id_produk;
 SELECT * FROM view_detail_penjualan;
 
 CREATE VIEW view_produk_stok_kurang_dari_5 AS
-SELECT nama_produk, stok
+SELECT 
+	nama_produk,
+    stok
 FROM tb_produk
 WHERE stok < 5;
 SELECT * FROM view_produk_stok_kurang_dari_5;
 
-CREATE OR REPLACE VIEW total_pesanan_per_pelanggan AS
-SELECT p.nama_pelanggan, 
-       COUNT(ps.id_pesanan) AS jumlah_total_pesanan,
-       GROUP_CONCAT(ps.tanggal_pesanan ORDER BY ps.tanggal_pesanan DESC) AS tanggal_pesanan
+CREATE VIEW total_pesanan_per_pelanggan AS
+SELECT p.nama_pelanggan, COUNT(ps.id_pesanan) AS jumlah_total_pesanan, ps.tanggal_pesanan
 FROM tb_pelanggan p
 JOIN tb_pesanan ps ON p.id_pelanggan = ps.id_pelanggan
 WHERE ps.tanggal_pesanan >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH) 
-GROUP BY p.nama_pelanggan;
-
+GROUP BY p.nama_pelanggan, ps.tanggal_pesanan;
 SELECT * FROM total_pesanan_per_pelanggan;
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+
+
+    
+
+
+    
