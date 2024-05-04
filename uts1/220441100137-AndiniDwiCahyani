@@ -1,0 +1,98 @@
+USE db_tokoelektronik;
+
+-- nomer1
+-- CREATE pesanan_lebih_dari_rata(
+-- SELECT supplier = nama_supplier, 
+
+-- nomer2
+-- CREATE stok_barang(
+-- SELECT nama_barang, stok_barang 
+-- FROM barang
+
+
+
+-- -- nomor3
+-- CREATE detail_transaksi(
+-- SELECT 
+
+-- nomor1
+DELIMITER //
+CREATE PROCEDURE nama_dan_stok(
+	IN nama_barang VARCHAR(100),
+    IN stok INT
+)
+BEGIN 
+	SELECT nama_dan_stok WHERE nama_barang LIKE '%e%' AND stok = stok_barang < 6;
+END //
+DELIMETER ;
+CALL nama_dan_stok (@nama_barang AND @stok_barang);
+
+	
+    
+-- nomor2
+DELIMITER //
+CREATE PROCEDURE data_tabel_transaksi(
+	IN tanggal_transaksi DATE,
+    IN jumlah_barang INT
+)
+BEGIN 
+	SELECT data_tabel_transaksi WHERE tanggal AND jumlah_barang 
+	
+
+-- nomor3
+DELIMITER //
+CREATE PROCEDURE jumlah_stok(
+	OUT stok_barang INT
+)
+BEGIN
+	SELECT COUNT(*) INTO stok_barang FROM barang;
+END //
+DELIMETER ;
+CALL jumlah_stok (@stok_barang);
+SELECT @stok_barang AS stok_barang;
+
+
+-- nomor4
+DELIMITER //
+CREATE PROCEDURE insert_supplier(
+	IN supplier_id INT,
+	IN nama_supplier VARCHAR(100),
+    IN alamat_supplier VARCHAR(225),
+    IN telepon_supplier VARCHAR(20)
+)
+BEGIN 
+	INSERT INTO supplier (supplier_id, nama_supplier, alamat_supplier, telepon_supplier)
+    VALUES (supplier_id, nama_supplier, alamat_supplier, telepon_supplier);
+END //
+DELIMITER ;
+CALL insert_supplier(100, 'Andini', 'Mojokerto', 123456789);
+SELECT * FROM supplier;
+DROP PROCEDURE insert_supplier;
+
+-- nomor5
+DELIMITER //
+CREATE PROCEDURE update_pembeli(
+	IN supplier_id INT,
+	IN nama_supplier VARCHAR(100),
+    IN alamat_supplier VARCHAR(225),
+    IN telepon_supplier VARCHAR(20)
+)
+BEGIN 
+	INSERT INTO supplier (supplier_id, nama_supplier, alamat_supplier, telepon_supplier)
+    VALUES (supplier_id, nama_supplier, alamat_supplier, telepon_supplier);
+END //
+DELIMITER ;
+CALL insert_supplier(100, 'Andini', 'Mojokerto', 123456789);
+SELECT * FROM supplier;
+DROP PROCEDURE insert_supplier;
+
+-- nomor6
+CREATE PROCEDURE hapus_tabel(
+
+BEGIN
+	DROP TABLE 
+	
+	
+
+    
+
