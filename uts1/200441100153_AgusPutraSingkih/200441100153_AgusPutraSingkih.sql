@@ -196,3 +196,10 @@ CREATE VIEW soal3 AS
 SELECT p.nama_barang, p.harga_barang, dp.jumlah_barang AS jumlah_terjual, (p.harga_barang * dp.jumlah_barang) AS total_pendapatan
 FROM barang p
 JOIN transaksi dp ON p.barang_id = dp.transaksi_id;
+
+
+
+
+
+
+
