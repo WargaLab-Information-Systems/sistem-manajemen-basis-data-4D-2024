@@ -3,6 +3,7 @@
 //SISTEM MANAJEMEN BASIS DATA - 4D
 UTS
 
+
 use wawaaaawwww;
 -- nomer 1
 select avg(total_harga) as rata_pesanan from transaksi;
