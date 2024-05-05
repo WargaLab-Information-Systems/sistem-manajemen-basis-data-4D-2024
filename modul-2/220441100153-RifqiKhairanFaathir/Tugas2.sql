@@ -70,11 +70,11 @@ INSERT INTO pesanan (id_pelanggan, tanggal_pesanan, total) VALUES
 (3, '2024-04-22', 400000),
 (4, '2024-04-21', 200000),
 (5, '2024-04-20', 350000),
-(6, '2024-04-19', 280000),
-(7, '2024-04-18', 150000),
-(8, '2024-04-17', 180000),
-(9, '2024-04-16', 220000),
-(10, '2024-04-15', 270000);
+(6, '2024-05-19', 280000),
+(7, '2024-05-18', 150000),
+(8, '2024-05-17', 180000),
+(9, '2024-05-16', 220000),
+(10, '2024-05-15', 270000);
 
 -- Menambahkan 10 data pada tabel detail_pesanan
 INSERT INTO detail_pesanan (id_pesanan, id_produk, jumlah) VALUES
@@ -110,8 +110,8 @@ WHERE stok < 5;
 
 -- view pelanggan dalam 1 bulan
 CREATE VIEW pesanan_pelanggan_bulanan AS
-SELECT p.nama_pelanggan, ps.tanggal_pesanan, COUNT(*) AS jumlah_pesanan
-FROM pelanggan p JOIN pesanan ps ON p.id_pelanggan = ps.id_pelanggan
+SELECT p.nama_pelanggan, ps.tanggal_pesanan, SUM(dp.jumlah) AS jumlah_pesanan
+FROM pelanggan p JOIN pesanan ps ON p.id_pelanggan = ps.id_pelanggan JOIN detail_pesanan dp ON ps.id_pesanan = dp.id_pesanan
 WHERE MONTH(ps.tanggal_pesanan) = MONTH(CURRENT_DATE()) AND YEAR(ps.tanggal_pesanan) = YEAR(CURRENT_DATE())
 GROUP BY p.nama_pelanggan, ps.tanggal_pesanan;
 
