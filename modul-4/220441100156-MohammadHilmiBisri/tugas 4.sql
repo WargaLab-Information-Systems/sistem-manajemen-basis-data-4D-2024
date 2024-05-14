@@ -98,15 +98,23 @@
     (20, 5, 2, '89');
 
     DELIMITER $$
-    CREATE PROCEDURE RATANILAI()
+    CREATE PROCEDURE GetMahasiswaRataNilai(
+        OUT p_nama_mahasiswa VARCHAR(100),
+        OUT p_semester VARCHAR(20),
+        OUT p_rata_nilai DECIMAL(5,2)
+    )
     BEGIN
         SELECT
             m.nama AS nama_mahasiswa,
             mk.semester,
-            AVG(n.nilai) AS rata_rata_nilai
+            AVG(n.nilai) AS rata_nilai
+        INTO
+            p_nama_mahasiswa,
+            p_semester,
+            p_rata_nilai
         FROM
             mahasiswa m
-        INNER JOIN
+        LEFT JOIN
             nilai n ON m.id_mahasiswa = n.id_mahasiswa
         LEFT JOIN
             mata_kuliah mk ON n.id_matakuliah = mk.id_matakuliah
@@ -114,3 +122,4 @@
             m.nama, mk.semester;
     END$$
     DELIMITER ;
+
