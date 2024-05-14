@@ -74,16 +74,16 @@
     INSERT INTO mahasiswa (id_mahasiswa, nama, jurusan, tanggal_masuk) VALUES (1, 'Mahasiswa 1', 'Jurusan 1', '2022-01-01'), (2, 'Mahasiswa 2', 'Jurusan 2', '2022-01-01'), (3, 'Mahasiswa 3', 'Jurusan 3', '2022-01-01'), (4, 'Mahasiswa 4', 'Jurusan 4', '2022-01-01'), (5, 'Mahasiswa 5', 'Jurusan 5', '2022-01-01'), (6, 'Mahasiswa 6', 'Jurusan 6', '2022-01-01'), (7, 'Mahasiswa 7', 'Jurusan 7', '2022-01-01'), (8, 'Mahasiswa 8', 'Jurusan 8', '2022-01-01'), (9, 'Mahasiswa 9', 'Jurusan 9', '2022-01-01'), (10, 'Mahasiswa 10', 'Jurusan 10', '2022-01-01');
 
     INSERT INTO nilai (id_nilai, id_mahasiswa, id_matakuliah, nilai) VALUES
-    (1, 1, 1, 'A'),
-    (2, 1, 2, 'B'),
-    (3, 2, 1, 'C'),
-    (4, 2, 2, 'A'),
-    (5, 3, 1, 'B'),
-    (6, 3, 2, 'C'),
-    (7, 4, 1, 'A'),
-    (8, 4, 2, 'B'),
-    (9, 5, 1, 'C'),
-    (10, 5, 2, 'A');
+    (1, 1, 1, '80'),
+    (2, 1, 2, '80'),
+    (3, 2, 1, '85'),
+    (4, 2, 2, '87'),
+    (5, 3, 1, '86'),
+    (6, 3, 2, '98'),
+    (7, 4, 1, '86'),
+    (8, 4, 2, '87'),
+    (9, 5, 1, '87'),
+    (10, 5, 2, '81');
         INSERT INTO nilai (id_nilai, id_mahasiswa, id_matakuliah, nilai) VALUES
     (11, 1, 1, '90'),
     (12, 1, 2, '80'),
