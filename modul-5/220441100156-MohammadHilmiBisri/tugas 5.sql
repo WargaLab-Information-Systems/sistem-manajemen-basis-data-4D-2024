@@ -130,3 +130,4 @@ USE logistik_pakaian;
     FROM stok
     WHERE id_produk = 3
     ORDER BY tgl_update ASC;
+    --anzacs
