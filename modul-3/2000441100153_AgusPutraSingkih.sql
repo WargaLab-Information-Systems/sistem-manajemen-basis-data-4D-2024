@@ -1,198 +1,229 @@
-CREATE DATABASE db_tokoelektronik;
-USE db_tokoelektronik;
--- drop database db_tokoelektronik;
 
-CREATE TABLE supplier (
-    supplier_id INT PRIMARY KEY,
-    nama_supplier VARCHAR(100),
-    alamat_supplier VARCHAR(255),
-    telepon_supplier VARCHAR(20)
-);
+CREATE DATABASE modul3;
+USE modul3;
+CREATE TABLE IF NOT EXISTS peminjaman (
+kode_peminjaman VARCHAR(10) PRIMARY KEY,
+IdAnggota VARCHAR(10),
+IdPetugas VARCHAR(10),
+TanggalPinjam DATE,
+TanggalKembali DATE,
+KodeBuku VARCHAR(10));
 
-CREATE TABLE penjual (
-    penjual_id INT PRIMARY KEY,
-    nama_penjual VARCHAR(100),
-    alamat_penjual VARCHAR(255),
-    telepon_penjual VARCHAR(20),
-    supplier_id INT,
-    FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id)
-);
-
-CREATE TABLE barang (
-    barang_id INT PRIMARY KEY,
-    nama_barang VARCHAR(100),
-    harga_barang DOUBLE,
-    stok_barang INT,
-    supplier_id INT,
-    penjual_id INT,
-    FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id),
-    FOREIGN KEY (penjual_id) REFERENCES penjual(penjual_id)
-);
-
-CREATE TABLE gudang (
-    gudang_id INT PRIMARY KEY,
-    penjual_id INT,
-    barang_id INT,
-    FOREIGN KEY (penjual_id) REFERENCES penjual(penjual_id),
-    FOREIGN KEY (barang_id) REFERENCES barang(barang_id)
-);
-
-CREATE TABLE pembeli (
-    pembeli_id INT PRIMARY KEY,
-    nama_pembeli VARCHAR(100),
-    alamat_pembeli VARCHAR(255),
-    telepon_pembeli VARCHAR(20)
-);
-
-CREATE TABLE transaksi (
-    transaksi_id INT PRIMARY KEY,
-    tanggal_transaksi DATE,
-    jumlah_barang INT,
-    total_harga DOUBLE,
-    penjual_id INT,
-    pembeli_id INT,
-    FOREIGN KEY (penjual_id) REFERENCES penjual(penjual_id),
-    FOREIGN KEY (pembeli_id) REFERENCES pembeli(pembeli_id)
-);
-
-CREATE TABLE pembayaran (
-    pembayaran_id INT PRIMARY KEY,
-    transaksi_id INT,
-    metode_pembayaran VARCHAR(50),
-    jumlah_pembayaran DOUBLE,
-    tanggal_pembayaran DATE,
-    FOREIGN KEY (transaksi_id) REFERENCES transaksi(transaksi_id)
-);
-
--- Isi data dummy untuk tabel supplier
-INSERT INTO supplier (supplier_id, nama_supplier, alamat_supplier, telepon_supplier) VALUES
-(1, 'PT Elektronik Jaya', 'Jl. Raya No. 123', '081234567890'),
-(2, 'CV Tekno Mandiri', 'Jl. Merdeka No. 45', '085678901234'),
-(3, 'UD Sinar Baru', 'Jl. Diponegoro No. 78', '082345678901'),
-(4, 'Toko Elektronik Maju', 'Jl. Pahlawan No. 10', '081234567890'),
-(5, 'Electro Gadgets', 'Jl. Gatot Subroto No. 32', '085678901234'),
-(6, 'Mitra Elektronik', 'Jl. Surya Sumantri No. 15', '082345678901'),
-(7, 'Energi Elektronik', 'Jl. Asia Afrika No. 56', '081234567890'),
-(8, 'Maju Jaya Elektronik', 'Jl. Hayam Wuruk No. 25', '085678901234'),
-(9, 'Cahaya Elektronik', 'Jl. Ahmad Yani No. 38', '082345678901'),
-(10, 'Galaxy Electronics', 'Jl. Sudirman No. 20', '081234567890');
-
--- Isi data dummy untuk tabel penjual
-INSERT INTO penjual (penjual_id, nama_penjual, alamat_penjual, telepon_penjual, supplier_id) VALUES
-(1, 'Budi Elektronik', 'Jl. Gatot Subroto No. 10', '081234567890', 1),
-(2, 'Ani Tekno', 'Jl. Merdeka No. 20', '085678901234', 2),
-(3, 'Joko Gadget', 'Jl. Asia Afrika No. 30', '082345678901', 3),
-(4, 'Siti Electronic', 'Jl. Pahlawan No. 40', '081234567890', 4),
-(5, 'Dewi Store', 'Jl. Surya Sumantri No. 50', '085678901234', 5),
-(6, 'Agus Elektronik', 'Jl. Hayam Wuruk No. 60', '082345678901', 6),
-(7, 'Rudi Tech', 'Jl. Diponegoro No. 70', '081234567890', 7),
-(8, 'Yuni Shop', 'Jl. Ahmad Yani No. 80', '085678901234', 8),
-(9, 'Eka Electronic', 'Jl. Sudirman No. 90', '082345678901', 9),
-(10, 'Fani Electronics', 'Jl. Raya No. 100', '081234567890', 10);
-
--- Isi data dummy untuk tabel barang
-INSERT INTO barang (barang_id, nama_barang, harga_barang, stok_barang, supplier_id, penjual_id) VALUES
-(1, 'Televisi LED 32 inci', 2500000, 10, 1, 1),
-(2, 'Kulkas 2 Pintu', 3500000, 8, 2, 2),
-(3, 'Laptop ASUS', 8000000, 15, 3, 3),
-(4, 'Mesin Cuci Front Loading', 4000000, 12, 4, 4),
-(5, 'Kamera Mirrorless', 6000000, 7, 5, 5),
-(6, 'Smartphone Samsung', 5000000, 20, 6, 6),
-(7, 'AC Split 1 PK', 4500000, 9, 7, 7),
-(8, 'Soundbar Sony', 3000000, 5, 8, 8),
-(9, 'Speaker Bluetooth', 1000000, 25, 9, 9),
-(10, 'Powerbank Xiaomi', 200000, 30, 10, 10);
-
--- Isi data dummy untuk tabel pembeli
-INSERT INTO pembeli (pembeli_id, nama_pembeli, alamat_pembeli, telepon_pembeli) VALUES
-(1, 'Ahmad', 'Jl. Veteran No. 5', '081234567890'),
-(2, 'Siti', 'Jl. Ahmad Yani No. 10', '085678901234'),
-(3, 'Budi', 'Jl. Diponegoro No. 15', '082345678901'),
-(4, 'Dewi', 'Jl. Merdeka No. 20', '081234567890'),
-(5, 'Eka', 'Jl. Asia Afrika No. 25', '085678901234'),
-(6, 'Fani', 'Jl. Gatot Subroto No. 30', '082345678901'),
-(7, 'Gita', 'Jl. Sudirman No. 35', '081234567890'),
-(8, 'Hadi', 'Jl. Hayam Wuruk No. 40', '085678901234'),
-(9, 'Ika', 'Jl. Pahlawan No. 45', '082345678901'),
-(10, 'Joko', 'Jl. Surya Sumantri No. 50', '081234567890');
-
--- Isi data dummy untuk tabel transaksi
-INSERT INTO transaksi (transaksi_id, tanggal_transaksi, jumlah_barang, total_harga, penjual_id, pembeli_id) VALUES
-(1, '2024-04-01', 2, 5000000, 1, 1),
-(2, '2024-04-02', 1, 3500000, 2, 2),
-(3, '2024-04-03', 3, 24000000, 3, 3),
-(4, '2024-04-04', 1, 4000000, 4, 4),
-(5, '2024-04-05', 2, 12000000, 5, 5),
-(6, '2024-04-06', 1, 5000000, 6, 6),
-(7, '2024-04-07', 1, 4500000, 7, 7),
-(8, '2024-04-08', 1, 3000000, 8, 8),
-(9, '2024-04-09', 5, 5000000, 9, 9),
-(10, '2024-04-10', 10, 2000000, 10, 10);
-
--- Isi data dummy untuk tabel pembayaran
-INSERT INTO pembayaran (pembayaran_id, transaksi_id, metode_pembayaran, jumlah_pembayaran, tanggal_pembayaran) VALUES
-(1, 1, 'Transfer Bank', 5000000, '2024-04-01'),
-(2, 2, 'Kartu Kredit', 3500000, '2024-04-02'),
-(3, 3, 'Tunai', 24000000, '2024-04-03'),
-(4, 4, 'Transfer Bank', 4000000, '2024-04-04'),
-(5, 5, 'Kartu Debit', 12000000, '2024-04-05'),
-(6, 6, 'Tunai', 5000000, '2024-04-06'),
-(7, 7, 'Transfer Bank', 4500000, '2024-04-07'),
-(8, 8, 'Kartu Kredit', 3000000, '2024-04-08'),
-(9, 9, 'Tunai', 5000000, '2024-04-09'),
-(10, 10, 'Kartu Debit', 2000000, '2024-04-10');
+ALTER TABLE peminjaman
+ADD CONSTRAINT FOREIGN KEY (KodeBuku) REFERENCES buku(KodeBuku);
 
 
--- soal 1 stored procedure
+ALTER TABLE peminjaman
+ADD COLUMN KodeBuku VARCHAR(10);
 
-DELIMITER//
-CREATE PROCEDURE soal1_sp (IN showdata VARCHAR(20))
-BEGIN 
-	SELECT nama_barang, stok_barang FROM barang WHERE barang LIKE '%e%' AND stok_barang <=10;
-END;
+CREATE TABLE petugas(
+IdPetugas VARCHAR(10) PRIMARY KEY,
+Username VARCHAR(10),
+PASSWORD VARCHAR(10),
+Nama VARCHAR(10));
+
+CREATE TABLE IF NOT EXISTS buku(
+KodeBuku VARCHAR(10) PRIMARY KEY,
+JudulBuku VARCHAR (10),
+PengarangBuku VARCHAR(10),
+Penerbit_Buku VARCHAR(10),
+TahunBuku VARCHAR(10),
+JumlahBuku VARCHAR(10),
+StatusBuku VARCHAR (10),
+KlasifikasiBuku VARCHAR(10));
+
+CREATE TABLE anggota(
+IdAnggota VARCHAR(10) PRIMARY KEY,
+NamaAnggota VARCHAR(20),
+AngkatanAngota VARCHAR(6),
+TempatLahirAnggota VARCHAR(20),
+TanggalLahirAnggota DATE,
+NoTelp INT(12),
+JenisKelamin VARCHAR(15),
+StatusPinjam VARCHAR(15));
+
+CREATE TABLE pengembalian(
+KodeKembali VARCHAR(10) PRIMARY KEY,
+IdAnggota VARCHAR(10),
+KodeBuku VARCHAR(10),
+IdPetugas VARCHAR(10),
+TanggalPinjam DATE,
+TanggalKembali DATE,
+Denda VARCHAR(15));
+
+ALTER TABLE pengembalian
+ADD CONSTRAINT FOREIGN KEY (IdAnggota) REFERENCES anggota(IdAnggota),
+ADD CONSTRAINT FOREIGN (KodeBuku) REFERENCES buku(KodeBuku),
+ADD CONSTRAINT FOREIGN KEY (IdPetugas) REFERENCES (idPetugas);
+
+ALTER TABLE pengembalian 
+ADD CONSTRAINT FOREIGN KEY (IdAnggota) REFERENCES anggota (IdAnggota);
+
+ALTER TABLE pengembalian 
+ADD CONSTRAINT FOREIGN KEY (IdPetugas) REFERENCES petugas (IdPetugas);
+
+ALTER TABLE pengembalian
+ADD CONSTRAINT FOREIGN KEY (KodeBuku) REFERENCES buku (KodeBuku);
+
+INSERT INTO petugas (IdPetugas, Username, PASSWORD, Nama) VALUES
+('P001', 'user1', 'pass1', 'John Doe'),
+('P002', 'user2', 'pass2', 'Jane Smith'),
+('P003', 'user3', 'pass3', 'Michael Johnson'),
+('P004', 'user4', 'pass4', 'Emily Brown'),
+('P005', 'user5', 'pass5', 'William Taylor'),
+('P006', 'user6', 'pass6', 'Sarah Anderson'),
+('P007', 'user7', 'pass7', 'David Martinez'),
+('P008', 'user8', 'pass8', 'Jessica Garcia'),
+('P009', 'user9', 'pass9', 'Daniel Rodriguez'),
+('P010', 'user10', 'pass10', 'Ashley Hernandez');
+
+INSERT INTO anggota (IdAnggota, NamaAnggota, AngkatanAngota, TempatLahirAnggota, TanggalLahirAnggota, NoTelp, JenisKelamin, StatusPinjam) VALUES
+('A001', 'John Doe', '2020', 'Jakarta', '2000-01-01', 1234567890, 'Laki-laki', 'Aktif'),
+('A002', 'Jane Smith', '2019', 'Bandung', '1999-02-02', 2345678901, 'Perempuan', 'Tidak Aktif'),
+('A003', 'Michael Johnson', '2021', 'Surabaya', '2001-03-03', 3456789012, 'Laki-laki', 'Aktif'),
+('A004', 'Emily Brown', '2020', 'Yogyakarta', '2000-04-04', 4567890123, 'Perempuan', 'Aktif'),
+('A005', 'William Taylor', '2018', 'Semarang', '1998-05-05', 5678901234, 'Laki-laki', 'Tidak Aktif'),
+('A006', 'Sarah Anderson', '2019', 'Malang', '1999-06-06', 6789012345, 'Perempuan', 'Aktif'),
+('A007', 'David Martinez', '2021', 'Solo', '2001-07-07', 7890123456, 'Laki-laki', 'Aktif'),
+('A008', 'Jessica Garcia', '2020', 'Denpasar', '2000-08-08', 8901234567, 'Perempuan', 'Tidak Aktif'),
+('A009', 'Daniel Rodriguez', '2017', 'Bali', '1997-09-09', 9012345678, 'Laki-laki', 'Aktif'),
+('A010', 'Ashley Hernandez', '2019', 'Medan', '1999-10-10', 1234567890, 'Perempuan', 'Aktif');
+
+INSERT INTO anggota (IdAnggota, NamaAnggota, AngkatanAngota, TempatLahirAnggota, TanggalLahirAnggota, NoTelp, JenisKelamin, StatusPinjam) VALUES
+('A001', 'John Doe', '2020', 'Jakarta', '2000-01-01', 1234567890, 'Laki-laki', 'Aktif'),
+('A002', 'Jane Smith', '2019', 'Bandung', '1999-02-02', 2345678901, 'Perempuan', 'Tidak Aktif'),
+('A003', 'Michael Johnson', '2021', 'Surabaya', '2001-03-03', 3456789012, 'Laki-laki', 'Aktif'),
+('A004', 'Emily Brown', '2020', 'Yogyakarta', '2000-04-04', 4567890123, 'Perempuan', 'Aktif'),
+('A005', 'William Taylor', '2018', 'Semarang', '1998-05-05', 5678901234, 'Laki-laki', 'Tidak Aktif'),
+('A006', 'Sarah Anderson', '2019', 'Malang', '1999-06-06', 6789012345, 'Perempuan', 'Aktif'),
+('A007', 'David Martinez', '2021', 'Solo', '2001-07-07', 7890123456, 'Laki-laki', 'Aktif'),
+('A008', 'Jessica Garcia', '2020', 'Denpasar', '2000-08-08', 8901234567, 'Perempuan', 'Tidak Aktif'),
+('A009', 'Daniel Rodriguez', '2017', 'Bali', '1997-09-09', 9012345678, 'Laki-laki', 'Aktif'),
+('A010', 'Ashley Hernandez', '2019', 'Medan', '1999-10-10', 1234567890, 'Perempuan', 'Aktif');
 
 
-SELECT * FROM soal1_sp;
+INSERT INTO pengembalian (KodeKembali, IdAnggota, KodeBuku, IdPetugas, TanggalPinjam, TanggalKembali, Denda) VALUES
+('PK001', 'A001', 'B001', 'P001', '2024-04-20', '2024-04-25', '0'),
+('PK002', 'A002', 'B002', 'P002', '2024-04-21', '2024-04-26', '0'),
+('PK003', 'A003', 'B003', 'P003', '2024-04-22', '2024-04-27', '0'),
+('PK004', 'A004', 'B004', 'P004', '2024-04-23', '2024-04-28', '0'),
+('PK005', 'A005', 'B005', 'P005', '2024-04-24', '2024-04-29', '0'),
+('PK006', 'A006', 'B006', 'P006', '2024-04-25', '2024-04-30', '0'),
+('PK007', 'A007', 'B007', 'P007', '2024-04-26', '2024-05-01', '0'),
+('PK008', 'A008', 'B008', 'P008', '2024-04-27', '2024-05-02', '0'),
+('PK009', 'A009', 'B009', 'P009', '2024-04-28', '2024-05-03', '0'),
+('PK010', 'A010', 'B010', 'P010', '2024-04-29', '2024-05-04', '0');
 
--- soal 4 stored Procedure
-DELIMITER//
-CREATE PROCEDURE tambahsuplier (
-IN supplier_id INT(3),
-IN nama_supplier VARCHAR (20),
-IN alamat_supplier VARCHAR (20),
-IN telepon_suplier VARCHAR(20))
+INSERT INTO buku (KodeBuku, JudulBuku, PengarangBuku, Penerbit_Buku, TahunBuku, JumlahBuku, StatusBuku, KlasifikasiBuku) VALUES
+('B001', 'Buku 1', 'Pengarang 1', 'Penerbit 1', '2022', '10', 'Tersedia', 'Klasifikasi 1'),
+('B002', 'Buku 2', 'Pengarang 2', 'Penerbit 2', '2023', '15', 'Tersedia', 'Klasifikasi 2'),
+('B003', 'Buku 3', 'Pengarang 3', 'Penerbit 3', '2021', '20', 'Tersedia', 'Klasifikasi 3'),
+('B004', 'Buku 4', 'Pengarang 4', 'Penerbit 4', '2024', '12', 'Tersedia', 'Klasifikasi 4'),
+('B005', 'Buku 5', 'Pengarang 5', 'Penerbit 5', '2020', '8', 'Tersedia', 'Klasifikasi 5'),
+('B006', 'Buku 6', 'Pengarang 6', 'Penerbit 6', '2019', '25', 'Tersedia', 'Klasifikasi 6'),
+('B007', 'Buku 7', 'Pengarang 7', 'Penerbit 7', '2018', '18', 'Tersedia', 'Klasifikasi 7'),
+('B008', 'Buku 8', 'Pengarang 8', 'Penerbit 8', '2017', '30', 'Tersedia', 'Klasifikasi 8'),
+('B009', 'Buku 9', 'Pengarang 9', 'Penerbit 9', '2016', '5', 'Tersedia', 'Klasifikasi 9'),
+('B010', 'Buku 10', 'Pengarang 10', 'Penerbit 10', '2015', '22', 'Tersedia', 'Klasifikasi 10');
+
+
+
+INSERT INTO peminjaman (kode_peminjaman, IdAnggota, IdPetugas, TanggalPinjam, TanggalKembali, KodeBuku) 
+VALUES 
+('PMJ0001', 'A001', 'P001', '2024-04-01', '2024-04-15', 'B001'),
+('PMJ0002', 'A002', 'P002', '2024-04-02', '2024-04-16', 'B002'),
+('PMJ0003', 'A003', 'P003', '2024-04-03', '2024-04-17', 'B003'),
+('PMJ0004', 'A004', 'P004', '2024-04-04', '2024-04-18', 'B004'),
+('PMJ0005', 'A005', 'P005', '2024-04-05', '2024-04-19', 'B005'),
+('PMJ0006', 'A006', 'P006', '2024-04-06', '2024-04-20', 'B006'),
+('PMJ0007', 'A007', 'P007', '2024-04-07', '2024-04-21', 'B007'),
+('PMJ0008', 'A008', 'P008', '2024-04-08', '2024-04-22', 'B008'),
+('PMJ0009', 'A009', 'P009', '2024-04-09', '2024-04-23', 'B009'),
+('PMJ0010', 'A010', 'P010', '2024-04-10', '2024-04-24', 'B010');
+
+DELIMITER //
+CREATE PROCEDURE SearchAnggotaByjkl(
+    IN p_JenisKelamin VARCHAR(10)
+)
 BEGIN
-	INSERT INTO supplier VALUES (supplier_id, nama_supplier, alamat_supplier, telepon_supplier);
+    SELECT * FROM anggota WHERE JenisKelamin = p_JenisKelamin;
+END //
+
+DELIMITER ;
+
+CALL SearchAnggotaByjkl('Laki-laki');
+
+DELIMITER//
+CREATE PROCEDURE getBuku (IN 
+	penerbit VARCHAR(20))
+BEGIN 
+SELECT * FROM buku WHERE Penerbit_Buku = penerbit;
+END//
+DELIMITER;
+CALL getBuku ('Penerbit 1');
+
+DELIMITER//
+CREATE PROCEDURE getPeminjaman (IN tgl DATE, IN kb VARCHAR(5))
+	BEGIN
+		SELECT * FROM peminjaman 
+		WHERE TanggalPinjam = tgl
+		AND KodeBuku = kb;
+	END//
+CALL getPeminjaman('2024-04-01', 'B001');
+
+DELIMITER//
+CREATE PROCEDURE getanggota (IN akt VARCHAR(5), IN tl VARCHAR(20), 
+				IN jk VARCHAR (10))
+	BEGIN 
+		SELECT * FROM anggota WHERE AngkatanAngota = akt
+		AND TempatLahirAnggota = tl
+		AND JenisKelamin = jk;
+	END//
+CALL getanggota ('2020', 'Jakarta', 'Laki-laki');
+
+DELIMITER //
+CREATE PROCEDURE inputAnggota (
+IN IdAnggota VARCHAR(10),
+IN NamaAnggota VARCHAR(20),
+IN AngkatanAngota VARCHAR(6),
+IN TempatLahirAnggota VARCHAR(20),
+IN TanggalLahirAnggota DATE,
+IN NoTelp INT(12),
+IN JenisKelamin VARCHAR(15),
+IN StatusPinjam VARCHAR(15))
+
+BEGIN
+	INSERT INTO anggota VALUES(
+	IdAnggota, NamaAnggota, AngkatanAngota, TempatLahirAnggota, TanggalLahirAnggota, 
+	NoTelp, JenisKelamin, StatusPinjam);
 END//
 
-CALL tambahsuplier ('11', 'Agus Putra Singkih', 'Bangkalan, Madura', '087755660522');
+CALL inputAnggota ('A011', 'Agus Putra Singkih', '2020', 'Bangkalan', 
+'2000-07-07', '087755660522', 'Laki-laki', 'Aktif');
 
--- soal6 stored procedure
+SELECT * FROM anggota;
 
 DELIMITER//
-CREATE PROCEDURE hapustable (IN hapus VARCHAR(10))
+CREATE PROCEDURE jumlahanggota(OUT jumlah_anggota INT(20))
+	BEGIN
+		SELECT COUNT(IdAnggota)
+		INTO jumlah_anggota FROM anggota;
+	END//
+	CALL jumlahanggota(@jumlah_anggota);
+	SELECT @jumlah_anggota
+
+DELIMITER//
+CREATE PROCEDURE jmlbuku (IN penulis VARCHAR(20),IN tahun VARCHAR(5), 
+OUT total INT (20))
 BEGIN
+	SELECT COUNT(KodeBuku) INTO total FROM buku
+	WHERE PengarangBuku=penulis AND TahunBuku=tahun;
+END//
 
+CALL jmlbuku('Agus', '2022', @total);
+SELECT @total
+2000441100153_AgusPutraSingkih.sql
+Menampilkan 2000441100153_AgusPutraSingkih.sql.
 
--- soal1 view
-CREATE VIEW soal1 AS
-SELECT pembeli.nama_pembeli, transaksi.total_harga, transaksi.tanggal_transaksi
-FROM pembeli
-JOIN transaksi ON pembeli.pembeli_id = transaksi.transaksi_id
-WHERE transaksi.total_harga > (
-	SELECT AVG(total_harga)FROM transaksi
-	);
-SELECT * FROM soal1;
+SELECT * FROM anggota;
 
-
--- soal2 view
-CREATE VIEW soal2 AS 
-SELECT nama_barang, stok_barang FROM barang WHERE stok_barang < 10;
-
-SELECT * FROM soal2;	
-
--- soal 3 view
-CREATE VIEW soal3 AS 
-SELECT p.nama_barang, p.harga_barang, dp.jumlah_barang AS jumlah_terjual, (p.harga_barang * dp.jumlah_barang) AS total_pendapatan
-FROM barang p
-JOIN transaksi dp ON p.barang_id = dp.transaksi_id;
