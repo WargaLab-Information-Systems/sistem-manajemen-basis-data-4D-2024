@@ -57,6 +57,235 @@ INSERT INTO notifications (notification_id, employee_id, message, date) VALUES (
 INSERT INTO companies (company_id, company_name, address) VALUES (1, 'Company X', 'Address X'), (2, 'Company Y', 'Address Y'), (3, 'Company Z', 'Address Z');
 
 
+-- stored procedure untuk menambahkan bonus ke karyawan yang telah bekerja lebih dari satu tahun
+CREATE PROCEDURE AddBonusToEmployees()
+BEGIN
+    DECLARE currentDate DATE;
+    DECLARE hireDate DATE;
+    DECLARE employeeSalary FLOAT;
+    DECLARE employeeId INT;
+    
+    SET currentDate = CURDATE();
+    
+    -- Iterasi melalui setiap karyawan
+    DECLARE employeeCursor CURSOR FOR
+        SELECT employee_id, salary, date_hired
+        FROM employees;
+    
+    -- deklarasi handler untuk pengecualian
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+    BEGIN
+        -- menutup cursor
+        CLOSE employeeCursor;
+    END;
+    
+    OPEN employeeCursor;
+    
+    -- pengulangan melalui setiap karyawan
+    employeeLoop: LOOP
+        FETCH employeeCursor INTO employeeId, employeeSalary, hireDate;
+        
+        -- exit ketika tidak ada karyawan lagi
+        IF employeeId IS NULL THEN
+            LEAVE employeeLoop;
+        END IF;
+        
+        -- kalikan gaji karyawan dengan bonus 10% jika telah bekerja lebih dari satu tahun
+        DECLARE yearsWorked INT;
+        SET yearsWorked = TIMESTAMPDIFF(YEAR, hireDate, currentDate);
+        
+        -- cek apakah karyawan telah bekerja lebih dari satu tahun
+        IF yearsWorked > 1 THEN
+            -- hitung jumlah bonus
+            DECLARE bonusAmount FLOAT;
+            SET bonusAmount = employeeSalary * 0.1;
+            
+            -- Update gaji karyawan dengan bonus
+            UPDATE employees
+            SET salary = salary + bonusAmount
+            WHERE employee_id = employeeId;
+        END IF;
+    END LOOP;
+    
+    CLOSE employeeCursor;
+END;
+
+
+-- stored procedure untuk memperpanjang proyek yang akan berakhir dalam satu bulan
+CREATE PROCEDURE ExtendProjects()
+BEGIN
+    DECLARE currentDate DATE;
+    DECLARE projectEndDate DATE;
+    DECLARE projectId INT;
+    
+    SET currentDate = CURDATE();
+    
+    -- Cursor untuk mengiterasi proyek
+    DECLARE projectCursor CURSOR FOR
+        SELECT project_id, end_date
+        FROM projects;
+    
+    -- Deklarasi handler untuk pengecualian
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+    BEGIN
+        -- Menutup cursor
+        CLOSE projectCursor;
+    END;
+    
+    OPEN projectCursor;
+    
+    -- Loop melalui setiap proyek
+    projectLoop: LOOP
+        FETCH projectCursor INTO projectId, projectEndDate;
+        
+        -- Keluar dari loop jika tidak ada proyek lagi
+        IF projectId IS NULL THEN
+            LEAVE projectLoop;
+        END IF;
+        
+        -- Hitung jumlah hari hingga akhir proyek
+        DECLARE daysUntilEnd INT;
+        SET daysUntilEnd = DATEDIFF(projectEndDate, currentDate);
+        
+        -- Cek jika proyek akan berakhir dalam satu bulan
+        IF daysUntilEnd < 30 THEN
+            -- Tambahkan 3 bulan ke tanggal akhir proyek
+            DECLARE newEndDate DATE;
+            SET newEndDate = DATE_ADD(projectEndDate, INTERVAL 3 MONTH);
+            
+            -- Perpanjang proyek dengan 3 bulan
+            UPDATE projects
+            SET end_date = newEndDate
+            WHERE project_id = projectId;
+        END IF;
+    END LOOP;
+    
+    CLOSE projectCursor;
+END;
+
+
+-- stored procedure untuk menambahkan sertifikat baru ke karyawan
+CREATE PROCEDURE UpdateEmployeeTraining()
+BEGIN
+    -- Cursor untuk mengiterasi karyawan
+    DECLARE employeeCursor CURSOR FOR
+        SELECT employee_id
+        FROM employees;
+    
+    -- Deklarasi handler untuk pengecualian
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+    BEGIN
+        -- Menutup cursor
+        CLOSE employeeCursor;
+    END;
+    
+    OPEN employeeCursor;
+    
+    -- Loop melalui setiap karyawan
+    employeeLoop: LOOP
+        DECLARE employeeId INT;
+        FETCH employeeCursor INTO employeeId;
+        
+        -- Keluar dari loop jika tidak ada karyawan lagi
+        IF employeeId IS NULL THEN
+            LEAVE employeeLoop;
+        END IF;
+        
+        -- Cursor untuk mengiterasi pelatihan baru untuk karyawan
+        DECLARE trainingId INT;
+        DECLARE trainingName VARCHAR(100);
+        DECLARE trainingDuration INT;
+        
+        DECLARE trainingCursor CURSOR FOR
+            SELECT training_id, certificate_name, duration_in_months
+            FROM trainings
+            WHERE training_id NOT IN (
+                SELECT certificate_id
+                FROM certificates
+                WHERE employee_id = employeeId
+            );
+        
+        -- Deklarasi handler untuk pengecualian
+        DECLARE CONTINUE HANDLER FOR NOT FOUND
+        BEGIN
+            -- Menutup cursor
+            CLOSE trainingCursor;
+        END;
+        
+        OPEN trainingCursor;
+        
+        -- Loop melalui setiap pelatihan baru
+        trainingLoop: LOOP
+            FETCH trainingCursor INTO trainingId, trainingName, trainingDuration;
+            
+            -- Keluar dari loop jika tidak ada pelatihan lagi
+            IF trainingId IS NULL THEN
+                LEAVE trainingLoop;
+            END IF;
+            
+            -- Tambahkan sertifikat baru ke karyawan
+            INSERT INTO certificates (certificate_id, employee_id, certificate_name, issue_date, expiry_date)
+            VALUES (trainingId, employeeId, trainingName, CURDATE(), DATE_ADD(CURDATE(), INTERVAL trainingDuration MONTH));
+        END LOOP;
+        
+        CLOSE trainingCursor;
+    END LOOP;
+    
+    CLOSE employeeCursor;
+END;
+
+
+-- stored procedure untuk mengirim pemberitahuan pelatihan ke karyawan
+CREATE PROCEDURE SendTrainingNotifications()
+BEGIN
+    -- Cursor untuk mengiterasi karyawan
+    DECLARE employeeCursor CURSOR FOR
+        SELECT employee_id
+        FROM employees;
+    
+    -- Deklarasi handler untuk pengecualian
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+    BEGIN
+        -- Menutup cursor
+        CLOSE employeeCursor;
+    END;
+    
+    OPEN employeeCursor;
+    
+    -- Loop melalui setiap karyawan
+    employeeLoop: LOOP
+        DECLARE employeeId INT;
+        FETCH employeeCursor INTO employeeId;
+        
+        -- Keluar dari loop jika tidak ada karyawan lagi
+        IF employeeId IS NULL THEN
+            LEAVE employeeLoop;
+        END IF;
+        
+        -- Dapatkan nama karyawan
+        DECLARE employeeName VARCHAR(100);
+        SET employeeName = (
+            SELECT name
+            FROM employees
+            WHERE employee_id = employeeId
+        );
+        
+        -- Dapatkan daftar pelatihan yang akan datang
+        DECLARE trainingMessage TEXT;
+        SET trainingMessage = (
+            SELECT GROUP_CONCAT(certificate_name SEPARATOR ', ')
+            FROM certificates
+            WHERE employee_id = employeeId
+                AND issue_date = CURDATE()
+        );
+        
+        -- Kirim pemberitahuan ke karyawan
+        INSERT INTO notifications (notification_id, employee_id, message, date)
+        VALUES (NULL, employeeId, CONCAT('Upcoming trainings: ', trainingMessage), CURDATE());
+    END LOOP;
+    
+    CLOSE employeeCursor;
+END;
 
 
 
