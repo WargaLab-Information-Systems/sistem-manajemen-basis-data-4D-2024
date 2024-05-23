@@ -56,7 +56,7 @@ INSERT INTO trainings (training_id, certificate_name, duration_in_months) VALUES
 INSERT INTO notifications (notification_id, employee_id, message, date) VALUES (1, 1, 'Notification A', '2022-01-01'), (2, 2, 'Notification B', '2022-02-15'), (3, 3, 'Notification C', '2022-03-10'), (4, 4, 'Notification D', '2022-04-20'), (5, 5, 'Notification E', '2022-05-05');
 INSERT INTO companies (company_id, company_name, address) VALUES (1, 'Company X', 'Address X'), (2, 'Company Y', 'Address Y'), (3, 'Company Z', 'Address Z');
 
-
+DELIMITER //
 CREATE PROCEDURE TambahBonusKepadaKaryawan()
 BEGIN
     -- Deklarasi variabel
@@ -108,9 +108,12 @@ BEGIN
 
     -- Menutup cursor
     CLOSE kursorKaryawan;
-END;
+END //
+DELIMITER ;
+CALL TambahBonusKepadaKaryawan();
+SELECT * FROM employees;
 
-
+DELIMITER //
 CREATE PROCEDURE PerpanjangProyek()
 BEGIN
     -- Deklarasi variabel
@@ -157,84 +160,122 @@ BEGIN
 
     -- Menutup cursor
     CLOSE kursorProyek;
-END;
+END //
+DELIMITER ;
+CALL PerpanjangProyek();
+SELECT * FROM projects;
 
-
-CREATE PROCEDURE UpdateEmployeeTraining()
-BEGIN
-    -- Deklarasi variabel
+DELIMITER //
+CREATE PROCEDURE UpdatePelatihanKaryawan() -- Membuat prosedur baru dengan nama "UpdatePelatihanKaryawan"
+BEGIN -- Mulai blok prosedur
+        -- Declare variables
     DECLARE selesai INT DEFAULT FALSE;
     DECLARE idKaryawan INT;
     DECLARE idPelatihan INT;
     DECLARE namaPelatihan VARCHAR(100);
     DECLARE durasiPelatihan INT;
+    DECLARE selesai2 INT DEFAULT FALSE;
+    DECLARE ciai INT;
+
+    -- Declare cursors
     DECLARE kursorKaryawan CURSOR FOR
         SELECT employee_id
         FROM employees;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai = TRUE;
+    DECLARE kursorPelatihan CURSOR FOR
+        SELECT training_id, certificate_name, duration_in_months
+        FROM trainings;
 
+    -- Declare handlers
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai = TRUE , selesai2 = TRUE;
+
+
+    SET ciai = (SELECT MAX(certificate_id) FROM certificates) + 1;
     -- Membuka cursor karyawan
-    OPEN kursorKaryawan;
+    OPEN kursorKaryawan; -- Membuka cursor "kursorKaryawan" untuk digunakan
 
     -- Loop untuk membaca data karyawan
-    baca_loop: LOOP
+    baca_loop: LOOP -- Mulai loop dengan label "baca_loop"
         -- Mengambil data karyawan dari cursor
-        FETCH kursorKaryawan INTO idKaryawan;
+        FETCH kursorKaryawan INTO idKaryawan; -- Mengambil baris berikutnya dari cursor "kursorKaryawan" dan menyimpan id karyawan ke dalam variabel "idKaryawan"
 
         -- Jika data tidak ditemukan, keluar dari loop
-        IF selesai THEN
-            LEAVE baca_loop;
+        IF selesai THEN -- Jika variabel "selesai" bernilai TRUE...
+            LEAVE baca_loop; -- ...keluar dari loop "baca_loop"
         END IF;
 
-        -- Deklarasi variabel dan cursor untuk pelatihan
-        DECLARE selesai2 INT DEFAULT FALSE;
-        DECLARE kursorPelatihan CURSOR FOR
-            SELECT training_id, certificate_name, duration_in_months
-            FROM trainings
-            WHERE training_id NOT IN (
-                SELECT certificate_id
-                FROM certificates
-                WHERE employee_id = idKaryawan
-            );
-        DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai2 = TRUE;
-
         -- Membuka cursor pelatihan
-        OPEN kursorPelatihan;
+        OPEN kursorPelatihan; -- Membuka cursor "kursorPelatihan" untuk digunakan
 
         -- Loop untuk membaca data pelatihan
-        baca_loop2: LOOP
+        baca_loop2: LOOP -- Mulai loop dengan label "baca_loop2"
             -- Mengambil data pelatihan dari cursor
-            FETCH kursorPelatihan INTO idPelatihan, namaPelatihan, durasiPelatihan;
+            FETCH kursorPelatihan INTO idPelatihan, namaPelatihan, durasiPelatihan; -- Mengambil baris berikutnya dari cursor "kursorPelatihan" dan menyimpan id pelatihan, nama pelatihan, dan durasi pelatihan ke dalam variabel "idPelatihan", "namaPelatihan", dan "durasiPelatihan"
 
             -- Jika data tidak ditemukan, keluar dari loop
-            IF selesai2 THEN
-                LEAVE baca_loop2;
+            IF selesai2 THEN -- Jika variabel "selesai2" bernilai TRUE...
+                LEAVE baca_loop2; -- ...keluar dari loop "baca_loop2"
             END IF;
 
             -- Menambahkan sertifikat baru ke tabel certificates
             INSERT INTO certificates (certificate_id, employee_id, certificate_name, issue_date, expiry_date)
-            VALUES (idPelatihan, idKaryawan, namaPelatihan, CURDATE(), DATE_ADD(CURDATE(), INTERVAL durasiPelatihan MONTH));
-        END LOOP;
+            VALUES (ciai, idKaryawan, namaPelatihan, CURDATE(), DATE_ADD(CURDATE(), INTERVAL durasiPelatihan MONTH)); 
+            SET ciai = ciai + 1;
+        END LOOP; -- Akhir dari loop "baca_loop2"
 
         -- Menutup cursor pelatihan
-        CLOSE kursorPelatihan;
-    END LOOP;
+        CLOSE kursorPelatihan; -- Menutup cursor "kursorPelatihan"
+    END LOOP; -- Akhir dari loop "baca_loop"
 
     -- Menutup cursor karyawan
-    CLOSE kursorKaryawan;
-END;
+    CLOSE kursorKaryawan; -- Menutup cursor "kursorKaryawan"
+END // -- Akhir dari blok prosedur
+DELIMITER ;
+INSERT INTO trainings (training_id, certificate_name, duration_in_months) VALUES (6, 'Training F', 18), (7, 'Training G', 24);
+CALL UpdatePelatihanKaryawan();
+SELECT * FROM Certificates;
 
-CREATE PROCEDURE KirimNotifikasiPelatihan()
+
+DELIMITER //
+CREATE OR REPLACE PROCEDURE KirimNotifikasiPelatihanBaru()
 BEGIN
     -- Deklarasi variabel
     DECLARE selesai INT DEFAULT FALSE;
     DECLARE idKaryawan INT;
-    DECLARE namaKaryawan VARCHAR(100);
-    DECLARE pesanPelatihan TEXT;
+    DECLARE niai INT;
+    DECLARE pelatihanBaru TEXT;
+    DECLARE semuapelatihan TEXT DEFAULT '';
     DECLARE kursorKaryawan CURSOR FOR
         SELECT employee_id
         FROM employees;
+    DECLARE kursorPelatihan CURSOR FOR
+        SELECT certificate_name
+        FROM trainings;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai = TRUE;
+
+    SET niai = (SELECT MAX(notification_id) FROM notifications) + 1;
+
+    -- Membuka cursor pelatihan
+    OPEN kursorPelatihan;
+
+    -- Loop untuk membaca data pelatihan
+    baca_loop2: LOOP
+        -- Mengambil data pelatihan dari cursor
+        FETCH kursorPelatihan INTO pelatihanBaru;
+
+        -- Jika data tidak ditemukan, keluar dari loop
+        IF selesai THEN
+            LEAVE baca_loop2;
+        END IF;
+
+        -- Menambahkan pelatihan baru ke daftar semua pelatihan
+        SET semuapelatihan = CONCAT(semuapelatihan, ', ', pelatihanBaru);
+    END LOOP;
+
+    -- Menutup cursor pelatihan
+    CLOSE kursorPelatihan;
+
+    -- Reset selesai flag
+    SET selesai = FALSE;
 
     -- Membuka cursor karyawan
     OPEN kursorKaryawan;
@@ -249,35 +290,17 @@ BEGIN
             LEAVE baca_loop;
         END IF;
 
-        -- Mengambil nama karyawan berdasarkan id
-        SET namaKaryawan = (
-            SELECT name
-            FROM employees
-            WHERE employee_id = idKaryawan
-        );
-
-        -- Mengambil pesan pelatihan berdasarkan karyawan dan tanggal hari ini
-        SET pesanPelatihan = (
-            SELECT GROUP_CONCAT(certificate_name SEPARATOR ', ')
-            FROM certificates
-            WHERE employee_id = idKaryawan
-                AND issue_date = CURDATE()
-        );
-
-        -- Menambahkan notifikasi pelatihan ke tabel notifications
+        -- Menambahkan notifikasi pelatihan baru ke tabel notifications
         INSERT INTO notifications (notification_id, employee_id, message, date)
-        VALUES (NULL, idKaryawan, CONCAT('Pelatihan yang akan datang: ', pesanPelatihan), CURDATE());
+        VALUES (niai, idKaryawan, CONCAT('Pelatihan baru yang akan datang: ', semuapelatihan), CURDATE());
+        SET niai = niai + 1;
     END LOOP;
 
     -- Menutup cursor karyawan
     CLOSE kursorKaryawan;
-END;
-
-
-
-
-
-
-
-
-
+END //
+DELIMITER ;
+CALL KirimNotifikasiPelatihanBaru();
+SELECT * FROM notifications;
+INSERT INTO trainings (training_id, certificate_name, duration_in_months)
+VALUES ('9','Nama Sertifikat', '2');
