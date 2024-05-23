@@ -59,6 +59,7 @@ INSERT INTO companies (company_id, company_name, address) VALUES (1, 'Company X'
 
 CREATE PROCEDURE TambahBonusKepadaKaryawan()
 BEGIN
+    -- Deklarasi variabel
     DECLARE selesai INT DEFAULT FALSE;
     DECLARE idKaryawan INT;
     DECLARE tanggalDihire DATE;
@@ -66,39 +67,53 @@ BEGIN
     DECLARE tahunBekerja INT;
     DECLARE jumlahBonus FLOAT;
     DECLARE tanggalSekarang DATE;
+    
+    -- Deklarasi cursor untuk mengambil data karyawan
     DECLARE kursorKaryawan CURSOR FOR
         SELECT employee_id, salary, date_hired
         FROM employees;
+    
+    -- Handler untuk menangani jika data tidak ditemukan
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai = TRUE;
 
+    -- Mengatur tanggal sekarang
     SET tanggalSekarang = CURDATE();
 
+    -- Membuka cursor
     OPEN kursorKaryawan;
 
+    -- Loop untuk membaca data karyawan
     baca_loop: LOOP
+        -- Mengambil data karyawan dari cursor
         FETCH kursorKaryawan INTO idKaryawan, gajiKaryawan, tanggalDihire;
 
+        -- Jika data tidak ditemukan, keluar dari loop
         IF selesai THEN
             LEAVE baca_loop;
         END IF;
 
+        -- Menghitung tahun bekerja
         SET tahunBekerja = TIMESTAMPDIFF(YEAR, tanggalDihire, tanggalSekarang);
 
+        -- Jika tahun bekerja lebih dari 1 tahun, tambahkan bonus
         IF tahunBekerja > 1 THEN
             SET jumlahBonus = gajiKaryawan * 0.1;
 
+            -- Update gaji karyawan dengan tambahan bonus
             UPDATE employees
             SET salary = salary + jumlahBonus
             WHERE employee_id = idKaryawan;
         END IF;
     END LOOP;
 
+    -- Menutup cursor
     CLOSE kursorKaryawan;
 END;
 
 
 CREATE PROCEDURE PerpanjangProyek()
 BEGIN
+    -- Deklarasi variabel
     DECLARE selesai INT DEFAULT FALSE;
     DECLARE idProyek INT;
     DECLARE tanggalSelesaiProyek DATE;
@@ -110,34 +125,44 @@ BEGIN
         FROM projects;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai = TRUE;
 
+    -- Mengatur tanggal sekarang
     SET tanggalSekarang = CURDATE();
 
+    -- Membuka cursor
     OPEN kursorProyek;
 
+    -- Loop untuk membaca data proyek
     baca_loop: LOOP
+        -- Mengambil data proyek dari cursor
         FETCH kursorProyek INTO idProyek, tanggalSelesaiProyek;
 
+        -- Jika data tidak ditemukan, keluar dari loop
         IF selesai THEN
             LEAVE baca_loop;
         END IF;
 
+        -- Menghitung hari hingga selesai proyek
         SET hariHinggaSelesai = DATEDIFF(tanggalSelesaiProyek, tanggalSekarang);
 
+        -- Jika hari hingga selesai kurang dari 30 hari, perpanjang tanggal selesai
         IF hariHinggaSelesai < 30 THEN
             SET tanggalBaruSelesai = DATE_ADD(tanggalSelesaiProyek, INTERVAL 3 MONTH);
 
+            -- Update tanggal selesai proyek
             UPDATE projects
             SET end_date = tanggalBaruSelesai
             WHERE project_id = idProyek;
         END IF;
     END LOOP;
 
+    -- Menutup cursor
     CLOSE kursorProyek;
 END;
 
 
 CREATE PROCEDURE UpdateEmployeeTraining()
 BEGIN
+    -- Deklarasi variabel
     DECLARE selesai INT DEFAULT FALSE;
     DECLARE idKaryawan INT;
     DECLARE idPelatihan INT;
@@ -148,15 +173,20 @@ BEGIN
         FROM employees;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai = TRUE;
 
+    -- Membuka cursor karyawan
     OPEN kursorKaryawan;
 
+    -- Loop untuk membaca data karyawan
     baca_loop: LOOP
+        -- Mengambil data karyawan dari cursor
         FETCH kursorKaryawan INTO idKaryawan;
 
+        -- Jika data tidak ditemukan, keluar dari loop
         IF selesai THEN
             LEAVE baca_loop;
         END IF;
 
+        -- Deklarasi variabel dan cursor untuk pelatihan
         DECLARE selesai2 INT DEFAULT FALSE;
         DECLARE kursorPelatihan CURSOR FOR
             SELECT training_id, certificate_name, duration_in_months
@@ -168,27 +198,35 @@ BEGIN
             );
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai2 = TRUE;
 
+        -- Membuka cursor pelatihan
         OPEN kursorPelatihan;
 
+        -- Loop untuk membaca data pelatihan
         baca_loop2: LOOP
+            -- Mengambil data pelatihan dari cursor
             FETCH kursorPelatihan INTO idPelatihan, namaPelatihan, durasiPelatihan;
 
+            -- Jika data tidak ditemukan, keluar dari loop
             IF selesai2 THEN
                 LEAVE baca_loop2;
             END IF;
 
+            -- Menambahkan sertifikat baru ke tabel certificates
             INSERT INTO certificates (certificate_id, employee_id, certificate_name, issue_date, expiry_date)
             VALUES (idPelatihan, idKaryawan, namaPelatihan, CURDATE(), DATE_ADD(CURDATE(), INTERVAL durasiPelatihan MONTH));
         END LOOP;
 
+        -- Menutup cursor pelatihan
         CLOSE kursorPelatihan;
     END LOOP;
 
+    -- Menutup cursor karyawan
     CLOSE kursorKaryawan;
 END;
 
 CREATE PROCEDURE KirimNotifikasiPelatihan()
 BEGIN
+    -- Deklarasi variabel
     DECLARE selesai INT DEFAULT FALSE;
     DECLARE idKaryawan INT;
     DECLARE namaKaryawan VARCHAR(100);
@@ -198,21 +236,27 @@ BEGIN
         FROM employees;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET selesai = TRUE;
 
+    -- Membuka cursor karyawan
     OPEN kursorKaryawan;
 
+    -- Loop untuk membaca data karyawan
     baca_loop: LOOP
+        -- Mengambil data karyawan dari cursor
         FETCH kursorKaryawan INTO idKaryawan;
 
+        -- Jika data tidak ditemukan, keluar dari loop
         IF selesai THEN
             LEAVE baca_loop;
         END IF;
 
+        -- Mengambil nama karyawan berdasarkan id
         SET namaKaryawan = (
             SELECT name
             FROM employees
             WHERE employee_id = idKaryawan
         );
 
+        -- Mengambil pesan pelatihan berdasarkan karyawan dan tanggal hari ini
         SET pesanPelatihan = (
             SELECT GROUP_CONCAT(certificate_name SEPARATOR ', ')
             FROM certificates
@@ -220,10 +264,12 @@ BEGIN
                 AND issue_date = CURDATE()
         );
 
+        -- Menambahkan notifikasi pelatihan ke tabel notifications
         INSERT INTO notifications (notification_id, employee_id, message, date)
         VALUES (NULL, idKaryawan, CONCAT('Pelatihan yang akan datang: ', pesanPelatihan), CURDATE());
     END LOOP;
 
+    -- Menutup cursor karyawan
     CLOSE kursorKaryawan;
 END;
 
