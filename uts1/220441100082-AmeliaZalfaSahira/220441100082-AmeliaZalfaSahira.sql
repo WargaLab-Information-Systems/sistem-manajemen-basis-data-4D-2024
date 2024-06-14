@@ -225,3 +225,5 @@ DELIMITER;
  SELECT*FROM insert_supplier;
  
  
+
+ 
